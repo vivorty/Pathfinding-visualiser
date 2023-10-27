@@ -1,9 +1,9 @@
 import pygame
-import random
+import math
 from queue import PriorityQueue
 
 WIDTH = 800
-WIN = pygame.display.set_mode((WIDTH, WIDTH))
+WINDOW = pygame.display.set_mode((WIDTH, WIDTH))
 pygame.display.set_caption("A* Path Finding Algorithm")
 
 RED = (55, 0, 0)
@@ -49,6 +49,9 @@ class Spot:
     
     def reset(self):
         self.color == WHITE
+    
+    def make_start(self):
+        self.color = ORANGE
 
     def make_closed(self):
         self.color = RED
@@ -65,8 +68,8 @@ class Spot:
     def make_path(self):
         self.color = PURPLE
 
-    def draw(self, win):
-        pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.width))
+    def draw(self, window):
+        pygame.draw.rect(window, self.color, (self.x, self.y, self.width, self.width))
 
     def update_neighbours(self, grid):
         pass
@@ -90,25 +93,65 @@ def make_grid(rows, width):
     
     return grid
 
-def draw_grid(win, rows, width): #this is going to draw the grid lines
+def draw_grid(window, rows, width): #this is going to draw the grid lines
     gap = width // rows
     for i in range(rows):
-        pygame.draw.line(win, GREY, (0, i*gap), (width, i*gap)) #draw a horizontal line for each of those rows
+        pygame.draw.line(window, GREY, (0, i * gap), (width, i * gap)) #draw a horizontal line for each of those rows
         for j in range(rows):
-            pygame.draw.line(win, GREY, (j*gap, 0), (i*gap, width)) #we are flipping the coordinates so we are going to be at the top and bottom and shift along the x-axis and draw vertical lines
+            pygame.draw.line(window, GREY, (j * gap, 0), (j * gap, width)) #we are flipping the coordinates so we are going to be at the top and bottom and shift along the x-axis and draw vertical lines
 
-def draw(win, grid, rows, width):
-    win.fill(WHITE)
+def draw(window, grid, rows, width):
+    window.fill(WHITE)
 
     for row in grid:
         for spot in row:
-            spot.draw(win)
-    draw_grid(win, rown, width)
+            spot.draw(window)
+    draw_grid(window, rows, width)
     pygame.display.update()
 
+def get_clicked_pos(pos, rows, width):
+    gap = width // rows
+    y, x = pos
 
-    
+    row = y // gap
+    col = x // gap
+    return row, col
 
+def main(window, width):
+    ROWS = 10
+    grid = make_grid(ROWS, width)
 
+    start = None
+    end = None
 
+    run = True
+    started = False
+    while run: #event could be someone pressing on the keyboard or mouse, or timer went off
+        draw(window, grid, ROWS, width)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: #if we press X button on the screen, stop running the programme
+                run = False
+
+            if started:
+                continue    
+
+            if pygame.mouse.get_pressed()[0]: #left mouse click
+                pos = pygame.mouse.get_pos() #mouse position on the screen
+                row, col = get_clicked_pos(pos, ROWS, width)
+                spot = grid[row][col]
+                if not start:
+                    start = spot
+                    start.make_start()
+                elif not end:
+                    end = spot
+                    end.make_end()
+
+                elif spot != end and spot != start:
+                    spot.make_barrier()
+                    
+            elif pygame.mouse.get_pressed()[2]: #right mouse click
+                pass
+    pygame.quit()
+
+main(WINDOW, WIDTH)
 
