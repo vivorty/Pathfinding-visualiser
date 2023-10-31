@@ -95,7 +95,7 @@ def h(p1, p2):
 
 def algorithm(draw, grid, start, end):
     count = 0
-    open_set = PriorityQueue
+    open_set = PriorityQueue()
     open_set.put((0, count, start))
     came_from = {}
     g_score = {spot: float("inf") for row in grid for spot in row}
@@ -114,7 +114,6 @@ def algorithm(draw, grid, start, end):
         open_set_hash.remove(current)
 
         if current == end:
-            pass #make path
             return True
         
         for neighbour in current.neighbours:
@@ -133,7 +132,7 @@ def algorithm(draw, grid, start, end):
 
         if current != start:
             current.make_closed()
-    return None
+    return False
 
 
 
